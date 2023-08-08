@@ -127,7 +127,8 @@ def create_video(output):
         input_streams.append(ffmpeg.input(audio_file))
 
     ffmpeg.concat(*input_streams, v=1, a=1).output(
-        os.path.join(output, "video.mp4")
+        os.path.join(output, "video.mp4"),
+        pix_fmt="yuv420p",
     ).run()
 
 
@@ -155,3 +156,7 @@ def main():
 
     create_slides(SYSTEM, speaker, output)
     create_video(output)
+
+
+if __name__ == "__main__":
+    main()
