@@ -10,6 +10,7 @@ sure to export your api key.
 ```console
 sudo apt install ffmpeg
 curl -sSL https://install.python-poetry.org | python3 -
+export OPENAI_API_KEY=sk-...
 ```
 
 ### Quickstart
