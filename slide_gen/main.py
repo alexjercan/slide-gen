@@ -98,7 +98,7 @@ def get_output_run(output):
     run_path = os.path.join(output, str(run))
     os.mkdir(run_path)
 
-    return run_path, run
+    return run_path, str(run)
 
 
 def get_voices():
