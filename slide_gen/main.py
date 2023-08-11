@@ -14,6 +14,8 @@ import ffmpeg
 import openai
 from tqdm import tqdm
 
+logging.basicConfig(level=logging.INFO)
+
 SYSTEM = """Your job is to create a slide presentation for a video. \
 In this presentation you must include a speech for the current slide and a \
 description for the background image. You need to make it as story-like as \
@@ -76,11 +78,12 @@ def parse_args() -> Args:
 
     args = parser.parse_args()
 
-    assert args.speaker in VOICES.title, "Speaker not found"
+    assert args.speaker in VOICES.title, "Invalid speaker"
 
+    speaker = get_voices().get(args.speaker, SPEAKER)
     prompt = sys.stdin.read()
 
-    return Args(prompt, args.speaker, args.output)
+    return Args(prompt, speaker, args.output)
 
 
 def get_output_run(output):
@@ -95,22 +98,12 @@ def get_output_run(output):
     run_path = os.path.join(output, str(run))
     os.mkdir(run_path)
 
-    return run_path
-
-
-def get_speaker(speaker):
-    """Get the speaker model token from the speaker title"""
-    try:
-        index = VOICES.title.index(speaker)
-        return VOICES.modelTokens[index]
-    except ValueError:
-        print("Speaker not found using default...")
-        return SPEAKER
+    return run_path, run
 
 
 def get_voices():
-    """Get the list of available voices"""
-    return VOICES.title
+    """Get the map of available voices"""
+    return dict(zip(VOICES.title, VOICES.modelTokens))
 
 
 def create_slides(system, prompt, speaker, output, api_key=None):
@@ -143,7 +136,9 @@ def create_slides(system, prompt, speaker, output, api_key=None):
 
     with tqdm(total=len(presentation)) as progress:
         for index, slide in enumerate(presentation):
-            progress.set_description(f"Slide {index}")
+            progress.set_description(
+                f"Slide {index}: Image '{slide['image']}' ..."
+            )
 
             response = openai.Image.create(
                 prompt=slide["image"],
@@ -155,6 +150,10 @@ def create_slides(system, prompt, speaker, output, api_key=None):
 
             path = os.path.join(output, f"slide_{index}.png")
             urllib.request.urlretrieve(image_url, path)
+
+            progress.set_description(
+                f"Slide {index}: TTS ({speaker}) '{slide['text']}' ..."
+            )
 
             path = os.path.join(output, f"slide_{index}.wav")
             fakeyou.FakeYou().say(slide["text"], speaker).save(path)
@@ -185,16 +184,16 @@ def create_video(output):
 
 def pipeline(args: Args, api_key: str = None) -> str:
     """Run the pipeline"""
-    logging.debug("Running pipeline with args: %s", args)
+    logging.info("Running pipeline with args: %s", args)
 
     prompt = args.prompt
-    speaker = get_speaker(args.speaker)
-    output = get_output_run(args.output)
+    speaker = args.speaker
+    output, run = get_output_run(args.output)
 
     create_slides(SYSTEM, prompt, speaker, output, api_key)
     create_video(output)
 
-    return output
+    return run
 
 
 def main():

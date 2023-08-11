@@ -33,6 +33,11 @@
     <form hx-post="/submit" hx-target="#result" class="vertical-form">
         <input type="password" name="api_key" placeholder="Enter the api key...">
         <textarea name="prompt" rows="10" cols="30" placeholder="Enter a prompt..."></textarea>
+        <select selected="TM:cpwrmn5kwh97" name="speaker">
+            {% for voice in voices %}
+                <option value="{{ voice.model_token }}">{{ voice.title }}</option>
+            {% endfor %}
+        </select>
         <input type="submit" value="Submit">
     </form>
 

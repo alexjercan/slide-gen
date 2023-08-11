@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, render_template, request
 
-from slide_gen import Args, pipeline
+from slide_gen import Args, get_voices, pipeline
 
 app = Flask(
     __name__,
@@ -15,19 +15,30 @@ videos_path = os.path.join(app.root_path, "..", "videos")
 os.makedirs(videos_path, exist_ok=True)
 
 
+class Voice:
+    def __init__(self, title, model_token):
+        self.title = title
+        self.model_token = model_token
+
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    voices = get_voices()
+    voices = [
+        Voice(title, model_token) for title, model_token in voices.items()
+    ]
+    return render_template("index.html", voices=voices)
 
 
 @app.route("/submit", methods=["POST"])
 def submit():
     api_key = request.form.get("api_key")
     prompt = request.form.get("prompt")
+    speaker = request.form.get("speaker")
 
-    args = Args(prompt, "Morgan Freeman", videos_path)
-    path = pipeline(args, api_key)
-    mp4_path = os.path.join(path, "video.mp4")
+    args = Args(prompt, speaker, videos_path)
+    video = pipeline(args, api_key)
+    mp4_path = os.path.join("videos", video, "video.mp4")
 
     response = f"""
     <h1>Video Generated</h1>
