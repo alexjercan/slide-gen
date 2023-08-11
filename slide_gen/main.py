@@ -1,15 +1,18 @@
 """Create a video from a slide presentation"""
 
 import argparse
-import os
 import glob
 import json
+import logging
+import os
 import sys
 import urllib.request
+from dataclasses import dataclass
 
 import fakeyou
 import ffmpeg
 import openai
+from tqdm import tqdm
 
 SYSTEM = """Your job is to create a slide presentation for a video. \
 In this presentation you must include a speech for the current slide and a \
@@ -41,6 +44,43 @@ something like:
 Make sure to output only JSON text. Do not output any extra comments.
 """
 SPEAKER = "TM:cpwrmn5kwh97"
+VOICES = fakeyou.FakeYou().list_voices()
+
+
+@dataclass
+class Args:
+    """Arguments for the pipeline"""
+
+    prompt: str
+    speaker: str
+    output: str
+
+
+def parse_args() -> Args:
+    """Parse the arguments for the pipeline"""
+    parser = argparse.ArgumentParser(
+        description="Create a video from a slide presentation"
+    )
+    parser.add_argument(
+        "--speaker",
+        help="The speaker title to use for the presentation",
+        default="Morgan Freeman",
+        required=False,
+    )
+    parser.add_argument(
+        "--output",
+        help="The output directory to use for the files",
+        default="videos",
+        required=False,
+    )
+
+    args = parser.parse_args()
+
+    assert args.speaker in VOICES.title, "Speaker not found"
+
+    prompt = sys.stdin.read()
+
+    return Args(prompt, args.speaker, args.output)
 
 
 def get_output_run(output):
@@ -61,17 +101,21 @@ def get_output_run(output):
 def get_speaker(speaker):
     """Get the speaker model token from the speaker title"""
     try:
-        voices = fakeyou.FakeYou().list_voices()
-        index = voices.title.index(speaker)
-        return voices.modelTokens[index]
+        index = VOICES.title.index(speaker)
+        return VOICES.modelTokens[index]
     except ValueError:
         print("Speaker not found using default...")
         return SPEAKER
 
 
-def create_slides(system, speaker, output):
+def get_voices():
+    """Get the list of available voices"""
+    return VOICES.title
+
+
+def create_slides(system, prompt, speaker, output, api_key=None):
     """Create the slides for the presentation"""
-    prompt = sys.stdin.read()
+    logging.info("Creating slides...")
 
     with open(
         os.path.join(output, "prompt.txt"), "w", encoding="utf-8"
@@ -87,6 +131,7 @@ def create_slides(system, speaker, output):
             },
             {"role": "user", "content": prompt},
         ],
+        api_key=api_key,
     )
 
     presentation = json.loads(response.choices[0].message.content)
@@ -96,25 +141,31 @@ def create_slides(system, speaker, output):
     ) as file:
         json.dump(presentation, file, indent=2)
 
-    for index, slide in enumerate(presentation):
-        print(slide["text"])
-        print(slide["image"])
-        print()
+    with tqdm(total=len(presentation)) as progress:
+        for index, slide in enumerate(presentation):
+            progress.set_description(f"Slide {index}")
 
-        response = openai.Image.create(
-            prompt=slide["image"], n=1, size="1024x1024"
-        )
-        image_url = response["data"][0]["url"]
+            response = openai.Image.create(
+                prompt=slide["image"],
+                n=1,
+                size="1024x1024",
+                api_key=api_key,
+            )
+            image_url = response["data"][0]["url"]
 
-        path = os.path.join(output, f"slide_{index}.png")
-        urllib.request.urlretrieve(image_url, path)
+            path = os.path.join(output, f"slide_{index}.png")
+            urllib.request.urlretrieve(image_url, path)
 
-        path = os.path.join(output, f"slide_{index}.wav")
-        fakeyou.FakeYou().say(slide["text"], speaker).save(path)
+            path = os.path.join(output, f"slide_{index}.wav")
+            fakeyou.FakeYou().say(slide["text"], speaker).save(path)
+
+            progress.update(1)
 
 
 def create_video(output):
     """Create the video from the slides"""
+    logging.info("Creating video...")
+
     image_files = sorted(glob.glob(os.path.join(output, "slide_*.png")))
     audio_files = sorted(glob.glob(os.path.join(output, "slide_*.wav")))
 
@@ -132,30 +183,23 @@ def create_video(output):
     ).run()
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Create a video from a slide presentation"
-    )
-    parser.add_argument(
-        "--speaker",
-        help="The speaker title to use for the presentation",
-        default="Morgan Freeman",
-        required=False,
-    )
-    parser.add_argument(
-        "--output",
-        help="The output directory to use for the files",
-        default="videos",
-        required=False,
-    )
+def pipeline(args: Args, api_key: str = None) -> str:
+    """Run the pipeline"""
+    logging.debug("Running pipeline with args: %s", args)
 
-    args = parser.parse_args()
-
+    prompt = args.prompt
     speaker = get_speaker(args.speaker)
     output = get_output_run(args.output)
 
-    create_slides(SYSTEM, speaker, output)
+    create_slides(SYSTEM, prompt, speaker, output, api_key)
     create_video(output)
+
+    return output
+
+
+def main():
+    """Main"""
+    pipeline(parse_args())
 
 
 if __name__ == "__main__":

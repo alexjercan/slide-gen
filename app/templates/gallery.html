@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Slide Gen</title>
+    <script
+        src="https://unpkg.com/htmx.org@1.9.4"
+        integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+        crossorigin="anonymous">
+    </script>
+</head>
+<body>
+    <h1>Video Gallery</h1>
+
+    <div>
+        {% for video in videos %}
+            <div>
+                <h2>{{ video.title }}</h2>
+                <video width="1024" height="1024" controls>
+                    <source src="{{ video.url }}" type="video/mp4">
+                </video>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
