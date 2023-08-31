@@ -2,8 +2,7 @@
 import os
 
 from flask import Flask, render_template, request
-
-from slide_gen import Args, get_voices, pipeline
+from slide_gpt import Args, get_voices, pipeline
 
 app = Flask(
     __name__,
