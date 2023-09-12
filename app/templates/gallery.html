@@ -7,17 +7,20 @@
         integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
         crossorigin="anonymous">
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Video Gallery</h1>
+<body class="flex flex-col items-center">
+    <h1 class="text-3xl">Video Gallery</h1>
 
-    <div>
+    <div class="flex flex-col justify-start items-center gap-4">
         {% for video in videos %}
-            <div>
-                <h2>{{ video.title }}</h2>
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl">{{ video.title }}</h2>
                 <video width="1024" height="1024" controls>
                     <source src="{{ video.url }}" type="video/mp4">
+                    <track label="English" kind="subtitles" srclang="en" src="{{ video.subtitles }}" default />
                 </video>
+                <p class="text-sm">{{ video.presentation }}</p>
             </div>
         {% endfor %}
     </div>

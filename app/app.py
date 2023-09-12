@@ -6,11 +6,11 @@ from slide_gpt import Args, get_voices, pipeline
 
 app = Flask(
     __name__,
-    static_url_path="/videos",
-    static_folder="../videos",
+    static_url_path="/static",
+    static_folder="static",
     template_folder="templates",
 )
-videos_path = os.path.join(app.root_path, "..", "videos")
+videos_path = os.path.join(app.root_path, "static", "videos")
 os.makedirs(videos_path, exist_ok=True)
 
 
@@ -37,14 +37,15 @@ def submit():
 
     args = Args(prompt, speaker, videos_path)
     video = pipeline(args, api_key)
-    mp4_path = os.path.join("videos", video, "video.mp4")
+    mp4_path = os.path.join("static", "videos", video, "video.mp4")
+    vtt_path = os.path.join("static", "videos", video, "presentation.vtt")
 
-    response = f"""
-    <h1>Video Generated</h1>
-    <video width="1024" height="1024" controls>
-        <source src="{mp4_path}" type="video/mp4">
-    </video>
-    """
+    response = f"""<h1>Video Generated</h1>
+<video width="1024" height="1024" controls>
+    <source src="{mp4_path}" type="video/mp4">
+    <track label="English" kind="subtitles" srclang="en" src="{vtt_path}" default />
+</video>
+"""
 
     return response
 
@@ -60,8 +61,18 @@ class Video:
             return f.read()
 
     @property
+    def presentation(self):
+        path = os.path.join(videos_path, self.video, "presentation.json")
+        with open(os.path.join(path), encoding="utf-8") as f:
+            return f.read()
+
+    @property
+    def subtitles(self):
+        return os.path.join("static", "videos", self.video, "presentation.vtt")
+
+    @property
     def url(self):
-        return os.path.join("videos", self.video, "video.mp4")
+        return os.path.join("static", "videos", self.video, "video.mp4")
 
 
 @app.route("/gallery")
