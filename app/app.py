@@ -31,12 +31,11 @@ def index():
 
 @app.route("/submit", methods=["POST"])
 def submit():
-    api_key = request.form.get("api_key")
     prompt = request.form.get("prompt")
     speaker = request.form.get("speaker")
 
-    args = Args(prompt, speaker, videos_path)
-    video = pipeline(args, api_key)
+    args = Args("gpt-4", prompt, speaker, videos_path)
+    video = pipeline(args)
     mp4_path = os.path.join("static", "videos", video, "video.mp4")
     vtt_path = os.path.join("static", "videos", video, "video.vtt")
 
@@ -78,7 +77,7 @@ class Video:
 @app.route("/gallery")
 def gallery():
     videos = []
-    for video in os.listdir(videos_path):
+    for video in sorted(os.listdir(videos_path)):
         videos.append(Video(video))
 
     return render_template("gallery.html", videos=videos)

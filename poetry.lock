@@ -809,13 +809,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "slide-gpt"
-version = "0.1.6"
+version = "0.1.7"
 description = "CLI tool for generating slides from text using ChatGPT and DALL-E"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "slide_gpt-0.1.6-py3-none-any.whl", hash = "sha256:fe75daf02445d0069839b0a7b14aa7ffe543cd4017445f4ee2b60d69a53fbbb0"},
-    {file = "slide_gpt-0.1.6.tar.gz", hash = "sha256:6004814eb34dda1cb3ed868589b018d8920b7623e2a32fea8c4c37e6eaca9b25"},
+    {file = "slide_gpt-0.1.7-py3-none-any.whl", hash = "sha256:7d5609bc38f168afb2b992fc759b42077e76a109778306f75e70d2e8c7f81c2c"},
+    {file = "slide_gpt-0.1.7.tar.gz", hash = "sha256:2fb46a6ab0658a45e40646ac211a336fb3406330bac1f587abb9b259633c4f41"},
 ]
 
 [package.dependencies]
@@ -1003,4 +1003,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8f50116c8a8622e52637f23bd1346eb96f743b3496ff4db52f0572cfde150935"
+content-hash = "5f3034198c1658019a9615469b230e27ac79b3331b72895e15e36e6aa83e328b"
