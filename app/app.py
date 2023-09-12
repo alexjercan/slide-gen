@@ -38,7 +38,7 @@ def submit():
     args = Args(prompt, speaker, videos_path)
     video = pipeline(args, api_key)
     mp4_path = os.path.join("static", "videos", video, "video.mp4")
-    vtt_path = os.path.join("static", "videos", video, "presentation.vtt")
+    vtt_path = os.path.join("static", "videos", video, "video.vtt")
 
     response = f"""<h1>Video Generated</h1>
 <video width="1024" height="1024" controls>
@@ -68,7 +68,7 @@ class Video:
 
     @property
     def subtitles(self):
-        return os.path.join("static", "videos", self.video, "presentation.vtt")
+        return os.path.join("static", "videos", self.video, "video.vtt")
 
     @property
     def url(self):
