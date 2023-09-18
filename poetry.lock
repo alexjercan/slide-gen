@@ -809,13 +809,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "slide-gpt"
-version = "0.1.7"
+version = "0.2.1"
 description = "CLI tool for generating slides from text using ChatGPT and DALL-E"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "slide_gpt-0.1.7-py3-none-any.whl", hash = "sha256:7d5609bc38f168afb2b992fc759b42077e76a109778306f75e70d2e8c7f81c2c"},
-    {file = "slide_gpt-0.1.7.tar.gz", hash = "sha256:2fb46a6ab0658a45e40646ac211a336fb3406330bac1f587abb9b259633c4f41"},
+    {file = "slide_gpt-0.2.1-py3-none-any.whl", hash = "sha256:72222a778d9806ac0554b624c5f8d30b3ed0d588387ff4f19d49e215ec5c289c"},
+    {file = "slide_gpt-0.2.1.tar.gz", hash = "sha256:a1031c95cf77948927d9a5430bf1de0cf74215ad43d2ec8d772a1f009de53255"},
 ]
 
 [package.dependencies]
@@ -859,13 +859,13 @@ telegram = ["requests"]
 
 [[package]]
 name = "typing-extensions"
-version = "4.7.1"
-description = "Backported and Experimental Type Hints for Python 3.7+"
+version = "4.8.0"
+description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.7.1-py3-none-any.whl", hash = "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36"},
-    {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
+    {file = "typing_extensions-4.8.0-py3-none-any.whl", hash = "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0"},
+    {file = "typing_extensions-4.8.0.tar.gz", hash = "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"},
 ]
 
 [[package]]
@@ -1003,4 +1003,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5f3034198c1658019a9615469b230e27ac79b3331b72895e15e36e6aa83e328b"
+content-hash = "574ded677d31225c816c1cd9ff85a3a8a1bf97ba6a84dd6e53ac696ecf9dbae8"
